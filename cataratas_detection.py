@@ -8,7 +8,7 @@ import numpy as np
 np.set_printoptions(suppress=True)
 
 # Load the model
-model = tensorflow.keras.models.load_model('keras_model.h5')
+model = tensorflow.keras.models.load_model('keras_model1.h5')
 
 # Create the array of the right shape to feed into the keras model
 # The 'length' or number of images you can put into the array is
@@ -48,7 +48,7 @@ def run():
     # Upload image
     uploaded_file = st.file_uploader("Ingrese una imagen para analizar", type=None)
     image = Image.open(uploaded_file)
-    st.image(image,  caption="Uploaded file successfully")
+    st.image(image, caption="Uploaded file successfully")
 
     # Function
     pred = clasify(image)
