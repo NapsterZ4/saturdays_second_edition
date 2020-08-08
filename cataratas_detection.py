@@ -4,6 +4,9 @@ import tensorflow.keras
 from PIL import Image, ImageOps
 import numpy as np
 
+threshold = 0.95
+width = 700
+
 # Disable scientific notation for clarity
 np.set_printoptions(suppress=True)
 
@@ -25,19 +28,21 @@ def clasify(image):
 
     # turn the image into a numpy array
     image_array = np.asarray(image)
+    if image_array.shape == (224, 224, 3):
+        # display the resized image
+        # image.show()
 
-    # display the resized image
-    # image.show()
+        # Normalize the image
+        normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
 
-    # Normalize the image
-    normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
+        # Load the image into the array
+        data[0] = normalized_image_array
 
-    # Load the image into the array
-    data[0] = normalized_image_array
-
-    # run the inference
-    prediction = model.predict(data)
-    return prediction
+        # run the inference
+        prediction = model.predict(data)
+        return prediction
+    else:
+        pass
 
 
 def main():
@@ -56,13 +61,25 @@ def main():
 
         if uploaded_file is not None:
             image = Image.open(uploaded_file)
-            st.image(image, caption="El archivo ha sido cargado exitosamente", width=500)
+            st.image(image, caption="El archivo ha sido cargado exitosamente", width=width)
             pred = clasify(image)
 
-            if pred[0][0] >= 0.95:
-                st.success("Catarata with probability: {}".format(str(pred[0][0])))
+            if pred is not None:
+                # Cataract
+                if pred[0][0] >= threshold:
+                    st.success("Catarata with probability: {}".format(str(pred[0][0])))
+                # Normal
+                elif pred[0][1] >= threshold:
+                    st.success("Normal with probability: {}".format(str(pred[0][1])))
+                else:
+                    st.warning(
+                        "La probabilidad no es confiable en la validacion de la imagen con las siguientes "
+                        "valoraciones: \n "
+                        "Catarata: {0} \n"
+                        "Normal: {1}".format(pred[0][0], pred[0][1]))
             else:
-                st.success("Normal with probability: {}".format(str(pred[0][1])))
+                st.warning("ERROR image shape is not support")
+
             image.close()
 
     if choice == "Modelo CNN":
@@ -71,14 +88,14 @@ def main():
         image = Image.open(uploaded_file)
 
         st.image(image, caption="El archivo ha sido cargado exitosamente pero aún no está lista la clasificación CNN",
-                 width=500)
+                 width=width)
 
     if choice == "Modelo ML":
         st.subheader("Clasificación mediante el modelo de aprendizaje de máquina")
         uploaded_file = st.file_uploader("Ingrese una imagen para analizar", type=None)
         image = Image.open(uploaded_file)
         st.image(image, caption="El archivo ha sido cargado exitosamente pero aún no está lista la clasificación ML",
-                 width=500)
+                 width=width)
 
 
 if __name__ == "__main__":
