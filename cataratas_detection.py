@@ -55,4 +55,5 @@ def run():
     st.success(pred)
 
 
-run()
+if __name__ == "__main__":
+    run()
