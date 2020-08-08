@@ -1,8 +1,12 @@
 import streamlit as st
 
 import tensorflow.keras
+#from tensorflow.python.estimator.keras import Layer
+from tensorflow.keras.layers import Layer
+#from keras.layers import Conv2D
 from PIL import Image, ImageOps
 import numpy as np
+
 
 # Disable scientific notation for clarity
 np.set_printoptions(suppress=True)
@@ -15,7 +19,7 @@ model = tensorflow.keras.models.load_model('keras_model1.h5')
 # determined by the first position in the shape tuple, in this case 1.
 data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
 
-
+@st.cache(allow_output_mutation=True)
 def clasify(image):
 
     # resize the image to a 224x224 with the same strategy as in TM2:
@@ -27,7 +31,7 @@ def clasify(image):
     image_array = np.asarray(image)
 
     # display the resized image
-    image.show()
+    #image.show()
 
     # Normalize the image
     normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
@@ -40,19 +44,40 @@ def clasify(image):
     return prediction
 
 
-def run():
-    st.sidebar.info("Aplicación para clasificar cataratas en los ojos")
-    st.sidebar.title("Cataratas detection")
-    st.title("Cataratas detection")
+def main():
+    ### Desabilita el FileUploaderEncodingWarning This change will go in effect after August 15, 2020. ###
+    st.set_option('deprecation.showfileUploaderEncoding', False)
+    st.title("Detector de Cataratas ")
+    ### agrega la barra de al lado para seleccionar el modelo que deseamos utilizar ###
+    activities = ["Modelo Teachable Machine","Modelo CNN","Modelo ML"]
+    choice = st.sidebar.selectbox("Seleccione el modelo a utilizar:",activities)
 
-    # Upload image
-    uploaded_file = st.file_uploader("Ingrese una imagen para analizar", type=None)
-    image = Image.open(uploaded_file)
-    st.image(image, caption="Uploaded file successfully")
+    if choice == "Modelo Teachable Machine":
+        st.subheader("Validación con modelo generado con Teachable Machine")
+        # Upload image
+        uploaded_file = st.file_uploader("Ingrese una imagen para analizar", type=None)    
+        image = Image.open(uploaded_file)
+        st.image(image, caption="El archivo ha sido cargado exitosamente",width=500)
+        # Function
+        pred = clasify(image)
+        predicted = st.success(pred)
 
-    # Function
-    pred = clasify(image)
-    st.success(pred)
+    if choice == "Modelo CNN":
+        st.subheader("Clasificación mediante el modelo de red neuronal convolucional")
+        uploaded_file = st.file_uploader("Ingrese una imagen para analizar", type=None)    
+        image = Image.open(uploaded_file)
+        st.image(image, caption="El archivo ha sido cargado exitosamente pero aún no está lista la clasificación CNN",width=500)
+    
+    if choice == "Modelo ML":
+        st.subheader("Clasificación mediante el modelo de aprendizaje de máquina")
+        uploaded_file = st.file_uploader("Ingrese una imagen para analizar", type=None)    
+        image = Image.open(uploaded_file)
+        st.image(image, caption="El archivo ha sido cargado exitosamente pero aún no está lista la clasificación ML",width=500)
+    
+
+    
+    
 
 
-run()
+if __name__ == "__main__":
+    main()
