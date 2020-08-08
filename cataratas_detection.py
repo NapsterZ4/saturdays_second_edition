@@ -59,8 +59,6 @@ def main():
             st.image(image, caption="El archivo ha sido cargado exitosamente", width=500)
             pred = clasify(image)
 
-            print(pred[0][0])
-
             if pred[0][0] >= 0.95:
                 st.success("Catarata with probability: {}".format(str(pred[0][0])))
             else:
