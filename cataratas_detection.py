@@ -153,6 +153,7 @@ def thresholding_based_features(im, imsize, quartiles):
 ##########################################################################
 
 # color averages
+@st.cache(allow_output_mutation=True)
 def various_features(image_ml):
     B = []
     G = []
@@ -228,7 +229,6 @@ def various_features(image_ml):
     X[0, start + 5:start + 10] = hist_feat_G[0]
     X[0, start + 10:start + 15] = hist_feat_R[0]
     X[0, start + 15:start + 20] = hist_feat_B[0]
-    print(X)
 
     return X
 
@@ -285,24 +285,22 @@ def machine_learning_model():
         st.image(image_ml, caption="El archivo ha sido cargado exitosamente...",
                  width=width)
 
-
         # Send to extract image caracters in dataset
         image_processing = various_features(image_ml)
         df_image_processing = pd.DataFrame(image_processing)
         predictions = predict_model(model_ml, df_image_processing)
         os.remove("/mnt/napster_disk/saturdays_ai/segunda_edicion/Proyecto/saturdays_second_edition/analizer.png")
-        result = predictions['Label']
-        score = predictions['score']
+        result = int(predictions['Label'])
+        score = float(predictions['Score'])
 
         if result == 0:
-            st.success("Es catarata")
+            st.success("Es glaucoma con {0} de probabilidad".format(score))
         elif result == 1:
-            st.success("Result")
+            st.success("Es normal con {0} de probabilidad".format(score))
         elif result == 2:
-            st.success("Result")
+            st.success("Problemas con la retina con {0} de probabilidad".format(score))
         elif result == 3:
-            st.success("Result")
-
+            st.success("Es catarata con {0} de probabilidad".format(score))
 
 
 def main():
