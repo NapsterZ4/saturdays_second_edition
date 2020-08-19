@@ -3,11 +3,10 @@ import streamlit as st
 import tensorflow.keras
 #from tensorflow.python.estimator.keras import Layer
 from tensorflow.keras.layers import Layer
-#from keras.layers import Conv2D
 from PIL import Image, ImageOps
 import numpy as np
 
-
+st.w
 # Disable scientific notation for clarity
 np.set_printoptions(suppress=True)
 
@@ -46,6 +45,7 @@ def clasify(image):
 
 def main():
     ### Desabilita el FileUploaderEncodingWarning This change will go in effect after August 15, 2020. ###
+    
     st.set_option('deprecation.showfileUploaderEncoding', False)
     st.title("Detector de Cataratas ")
     ### agrega la barra de al lado para seleccionar el modelo que deseamos utilizar ###
@@ -55,12 +55,13 @@ def main():
     if choice == "Modelo Teachable Machine":
         st.subheader("Validación con modelo generado con Teachable Machine")
         # Upload image
-        uploaded_file = st.file_uploader("Ingrese una imagen para analizar", type=None)    
-        image = Image.open(uploaded_file)
-        st.image(image, caption="El archivo ha sido cargado exitosamente",width=500)
+        uploaded_file = st.file_uploader("Ingrese una imagen para analizar", type=None)
+        if uploaded_file is not None:
+            image = Image.open(uploaded_file)        
+            st.image(image, caption="El archivo ha sido cargado exitosamente",width=500)
         # Function
-        pred = clasify(image)
-        predicted = st.success(pred)
+            pred = clasify(image)
+            predicted = st.success(pred)
 
     if choice == "Modelo CNN":
         st.subheader("Clasificación mediante el modelo de red neuronal convolucional")
@@ -75,7 +76,6 @@ def main():
         st.image(image, caption="El archivo ha sido cargado exitosamente pero aún no está lista la clasificación ML",width=500)
     
 
-    
     
 
 
